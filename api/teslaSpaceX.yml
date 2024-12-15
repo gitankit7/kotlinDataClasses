@@ -1,0 +1,106 @@
+asyncapi: 3.0.0
+info:
+  title: Tesla to SpaceX Integration
+  version: 1.0.0
+  description: |
+    This API facilitates the integration of Tesla vehicle telemetry with SpaceX satellite systems for enhanced connectivity and data-driven insights.
+  contact:
+    name: Integration Support
+    url: https://support.tesla-spacex.com
+    email: support@tesla-spacex.com
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  production:
+    host: satellite-network.spacex.prod:9094
+    protocol: kafka
+    description: Production Kafka broker for Tesla-Spacex data stream
+  development:
+    host: satellite-network.spacex.dev:9094
+    protocol: kafka
+    description: Development Kafka broker for Tesla-Spacex integration
+
+channels:
+  tesla.telemetry:
+    address: tesla.telemetry
+    messages:
+      telemetryDataMessage:
+        $ref: '#/components/messages/TelemetryData'
+
+operations:
+  telemetryDataStream:
+    action: receive
+    channel:
+      $ref: '#/channels/tesla.telemetry'
+    summary: Stream Tesla vehicle telemetry data
+    description: A topic for streaming real-time telemetry data from Tesla vehicles to SpaceX systems
+    tags:
+      - name: telemetry
+      - name: satellite
+
+components:
+  messages:
+    TelemetryData:
+      name: TelemetryData
+      title: Vehicle Telemetry Data
+      summary: Real-time telemetry data from Tesla vehicles
+      contentType: application/json
+      headers:
+        $ref: '#/components/schemas/TelemetryHeaders'
+      payload:
+        $ref: '#/components/schemas/TelemetryPayload'
+
+  schemas:
+    TelemetryHeaders:
+      type: object
+      properties:
+        event_type:
+          type: string
+          enum:
+            - SPEED_UPDATE
+            - LOCATION_UPDATE
+            - BATTERY_STATUS
+          description: The type of telemetry event
+        event_timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event
+
+    TelemetryPayload:
+      type: object
+      additionalProperties: false
+      required:
+        - vehicle_id
+        - location
+        - battery_status
+      properties:
+        vehicle_id:
+          type: string
+          description: Unique identifier for the Tesla vehicle
+        location:
+          $id: Location
+          type: object
+          required:
+            - latitude
+            - longitude
+          properties:
+            latitude:
+              type: number
+              description: Latitude coordinate
+            longitude:
+              type: number
+              description: Longitude coordinate
+          description: The geographic location of the vehicle
+        speed:
+          type: number
+          description: Current speed of the vehicle in km/h
+        battery_status:
+          $id: BatteryStatusEnum
+          type: string
+          enum:
+            - FULL
+            - CHARGING
+            - LOW
+          description: Current battery status of the vehicle
