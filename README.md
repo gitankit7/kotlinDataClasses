@@ -1,7 +1,8 @@
-# kotlinDataClasses
+# kotlinDataClasses from yml file
 yml to backend data classes Generation using asyncapi
 
-We make use of asyncapi/modelina tool to generate data classes in Kotlin.
+AsyncAPI is an open-source specification that allows you to describe and document message-driven APIs.
+This document can be updated by non technical people such as BAs, POs to define the contract and then we can directly generate code from it using asyncapi/modelina.
 
 Pre-requisites:-
 npm install @asyncapi/modelina
